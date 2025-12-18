@@ -103,6 +103,7 @@ protected:
   // Convert Angular Velocity from degree/s to radian/s
   double From_degs_To_rads(double degree);
   std::string frame_id_;
+  std::string imu_frame_id_;
 
   rclcpp::Subscription<std_msgs::msg::UInt8MultiArray>::SharedPtr crt_sub_;
   rclcpp::Subscription<hesai_ros_driver::msg::UdpFrame>::SharedPtr pkt_sub_;
@@ -123,6 +124,7 @@ inline void SourceDriver::Init(const YAML::Node& config)
   DriveYamlParam yaml_param;
   yaml_param.GetDriveYamlParam(config, driver_param);
   frame_id_ = driver_param.input_param.frame_id;
+  imu_frame_id_ = driver_param.input_param.imu_frame_id.empty() ? frame_id_ : driver_param.input_param.imu_frame_id;
 
   node_ptr_.reset(new rclcpp::Node("hesai_ros_driver_node"));
   if (driver_param.input_param.send_point_cloud_ros) {
@@ -371,7 +373,7 @@ inline sensor_msgs::msg::Imu SourceDriver::ToRosMsg(const LidarImuData &imu_conf
   } else {
     printf("does not support timestamps greater than 19 January 2038 03:14:07 (now %lf)\n", imu_config_.timestamp);
   }
-  ros_msg.header.frame_id = frame_id_;
+  ros_msg.header.frame_id = imu_frame_id_;
   ros_msg.linear_acceleration.x = From_g_To_ms2(imu_config_.imu_accel_x);
   ros_msg.linear_acceleration.y = From_g_To_ms2(imu_config_.imu_accel_y);
   ros_msg.linear_acceleration.z = From_g_To_ms2(imu_config_.imu_accel_z);

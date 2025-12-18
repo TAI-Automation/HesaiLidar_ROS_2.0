@@ -80,6 +80,7 @@ public:
         YamlRead<uint16_t>(   driver_config, "device_fault_port",         driver_param.input_param.device_fault_port, 0);
         YamlRead<float>(      driver_config, "frame_frequency",           driver_param.decoder_param.frame_frequency, 0);
         YamlRead<float>(      driver_config, "default_frame_frequency",   driver_param.decoder_param.default_frame_frequency, 10);
+        YamlRead<float>(      driver_config, "min_distance_threshold",    driver_param.decoder_param.min_distance_threshold, 0.0);
         YamlRead<uint16_t>(   driver_config, "echo_mode_filter",          driver_param.decoder_param.echo_mode_filter, 0);
         // Do not use YamlRead<uint8_t>, Yaml cannot recognise uint8_t, There will be some unexpected values.
 
@@ -88,6 +89,7 @@ public:
         YamlRead<bool>(       config["ros"], "send_point_cloud_ros",       driver_param.input_param.send_point_cloud_ros, false);
         YamlRead<bool>(       config["ros"], "send_imu_ros",               driver_param.input_param.send_imu_ros, false);
         YamlRead<std::string>(config["ros"], "ros_frame_id",               driver_param.input_param.frame_id, "hesai_lidar");
+        YamlRead<std::string>(config["ros"], "ros_imu_frame_id",           driver_param.input_param.imu_frame_id, "");
         YamlRead<std::string>(config["ros"], "ros_send_packet_topic",      driver_param.input_param.ros_send_packet_topic, "hesai_packets");
         YamlRead<std::string>(config["ros"], "ros_send_point_cloud_topic", driver_param.input_param.ros_send_point_topic, "hesai_points");
         YamlRead<std::string>(config["ros"], "ros_recv_packet_topic",      driver_param.input_param.ros_recv_packet_topic, "hesai_packets");
