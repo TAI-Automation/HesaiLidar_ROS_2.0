@@ -46,6 +46,12 @@ message(=============================================================)
 message("-- ROS_VERSION is $ENV{ROS_VERSION}")
 message(=============================================================)
 
+if("$ENV{ROS_DISTRO}" STREQUAL "humble")
+  add_compile_definitions(ROS_DISTRO_HUMBLE)
+elseif("$ENV{ROS_DISTRO}" STREQUAL "rolling")
+  add_compile_definitions(ROS_DISTRO_ROLLING)
+endif()
+
 
 #========================
 # Project details / setup
@@ -59,16 +65,11 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
   add_definitions(-O3)
 endif()
 
-if(($ENV{ROS_DISTRO} STREQUAL "kilted"))
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-elseif(($ENV{ROS_DISTRO} STREQUAL "jazzy"))
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-elseif($ENV{ROS_DISTRO} STREQUAL "humble")  # the ros2 humble requires c++17
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+if($ENV{ROS_VERSION} MATCHES "2")
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
 else()
-add_definitions(-std=c++14)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 add_compile_options(-Wall)
@@ -127,16 +128,16 @@ if($ENV{ROS_VERSION} MATCHES "2")
 
     add_definitions(-DROS2_FOUND)
     include_directories(${rclcpp_INCLUDE_DIRS})
-    set(CMAKE_CXX_STANDARD 14)
 
     find_package(ament_cmake REQUIRED)
     find_package(sensor_msgs REQUIRED)
     find_package(std_msgs REQUIRED)  
+    find_package(rcl_interfaces REQUIRED)
+    find_package(rcutils REQUIRED)
     find_package(rclcpp_action REQUIRED)
     find_package(rosidl_typesupport_c REQUIRED) 
     find_package(rosidl_default_generators REQUIRED)
     find_package(builtin_interfaces REQUIRED)
-    find_package(std_msgs REQUIRED)
     
     rosidl_generate_interfaces(${PROJECT_NAME}
       "msg/msg_ros2/UdpPacket.msg"
@@ -245,7 +246,7 @@ if($ENV{ROS_VERSION} MATCHES "2")
   # "tf2_geometry_msgs"
   )
 
-if(($ENV{ROS_DISTRO} STREQUAL "kilted") OR ($ENV{ROS_DISTRO} STREQUAL "jazzy") OR ($ENV{ROS_DISTRO} STREQUAL "humble"))
+if(($ENV{ROS_DISTRO} STREQUAL "kilted") OR ($ENV{ROS_DISTRO} STREQUAL "jazzy") OR ($ENV{ROS_DISTRO} STREQUAL "humble") OR ($ENV{ROS_DISTRO} STREQUAL "rolling") OR ($ENV{ROS_DISTRO} STREQUAL "iron"))
   rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
   target_link_libraries(hesai_ros_driver_node "${cpp_typesupport_target}")
 else()
@@ -267,5 +268,3 @@ endif()
   ament_package()
 
 endif($ENV{ROS_VERSION} MATCHES "2")
-
-
